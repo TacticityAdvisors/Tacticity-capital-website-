@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Manrope:wght@700;800&display=swap");
 /* ---------- Fonts ----------
    Original site uses Suisse Intl (commercial, Swiss Typefaces) + Manrope Bold.
    Drop licensed files into /fonts to get an exact match; until then the stack
@@ -286,3 +287,118 @@ body{transition:none}
 .fundSlides_section:nth-child(n+5) .fundSlides_pattern{filter:invert(1)}
 .footer_pattern{filter:invert(1)}
 .footer_link:after{background:#0b2e22}
+
+/* =====================================================================
+   Strategy + Team pages: scroll-circle reveal, directory, cards
+   Palettes: alpine greens (#0b2e22 to #e8f3ec)
+   ===================================================================== */
+[hidden]{display:none!important}
+.t-team{--light:#cfe6d6;--dark:#214638;--ink:#0b2e22;--paper:#f1f8f3}
+.t-strategy{--light:#a8d5ba;--dark:#0b2e22;--ink:#0b2e22;--paper:#e3f0e7}
+
+/* --- hero + dark circle reveal --- */
+.maskp{position:relative;background:var(--light);color:var(--ink)}
+.maskp_sticky{position:relative;background:var(--light)}
+.maskp_hero{display:flex;align-items:flex-end;min-height:70vh;padding-top:14rem;padding-bottom:4rem}
+.maskp_hero--inv{display:none}
+.maskp_dark{position:relative;background:var(--dark);color:var(--light);padding:8rem 3.125rem}
+.maskp_lines{height:20rem;margin:4rem 0;background-image:repeating-linear-gradient(to bottom,var(--light) 0,var(--light) 1px,transparent 1px,transparent 1.7rem);opacity:.7}
+.maskp_text h2{margin-bottom:3rem}
+.maskp_text p{max-width:42rem}
+.maskp_hint{display:none}
+@media (min-width:812px){
+  .maskp{height:300vh}
+  .maskp_sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+  .maskp_hero{position:absolute;inset:0;min-height:0;padding-top:0;padding-bottom:0;align-items:center;max-width:none;margin:0;width:100%}
+  .maskp_hero--inv{display:flex;color:var(--light);transition:opacity .7s,transform 1s cubic-bezier(.77,0,.175,1)}
+  .maskp.is-open .maskp_hero--inv{opacity:0;transform:translateY(-14rem)}
+  .maskp_dark{position:absolute;inset:0;padding:0;clip-path:circle(0 at 50% 50%);will-change:clip-path}
+  .maskp_lines{position:absolute;top:10vh;bottom:10vh;left:48%;right:6rem;height:auto;margin:0;clip-path:inset(0 100% 0 0);transition:clip-path 1.4s cubic-bezier(.77,0,.175,1)}
+  .maskp.is-open .maskp_lines{clip-path:inset(0 0 0 0)}
+  .maskp_text{position:absolute;left:6rem;bottom:10vh;width:46rem;opacity:0;transform:translateY(3rem);transition:opacity .9s .2s,transform 1.1s .2s cubic-bezier(.16,1.08,.38,.98)}
+  .maskp.is-open .maskp_text{opacity:1;transform:none}
+  .maskp_hint{display:block;position:absolute;left:6rem;bottom:5rem;font-size:max(1.4rem,11px);font-weight:700;letter-spacing:-.02em;transition:opacity .5s}
+  .maskp.is-scrolled .maskp_hint{opacity:0}
+}
+
+/* --- directory (filters + grid) --- */
+.directory{position:relative;z-index:1;background:var(--paper);color:var(--ink);padding-top:10rem;padding-bottom:14rem}
+.directory_inner{display:flex;flex-direction:column}
+.directory_filters{display:flex;flex-wrap:wrap;gap:1rem 2.4rem;margin-bottom:5rem}
+.filter_btn{font-size:2rem;line-height:1.2;font-weight:600;letter-spacing:-.02em;word-spacing:.1em;color:inherit;opacity:.55;cursor:pointer;background:none;border:0;padding:0;font-family:inherit;text-align:left;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:.25em;text-decoration-thickness:2px;transition:opacity .4s,text-decoration-color .4s}
+.filter_btn:hover{opacity:1}
+.filter_btn.is-active{opacity:1;text-decoration-color:currentColor}
+.directory_grid{display:grid;grid-template-columns:repeat(2,1fr);gap:4rem 2rem}
+@media (min-width:812px){
+  .directory_inner{flex-direction:row}
+  .directory_filters{flex:0 0 32rem;flex-direction:column;flex-wrap:nowrap;gap:.2rem;margin:0;align-self:flex-start;position:sticky;top:42vh}
+  .directory_grid{flex:1;grid-template-columns:repeat(3,1fr);gap:7rem 3.5rem}
+  .directory_grid--cards{grid-template-columns:repeat(2,1fr);gap:3.5rem}
+}
+@keyframes rise{from{opacity:0;transform:translateY(3rem)}to{opacity:1;transform:none}}
+.is-shown{animation:rise .9s cubic-bezier(.16,1.08,.38,.98) both}
+.member[data-reveal],.sCard[data-reveal]{opacity:0;transform:translateY(4rem);transition:opacity .9s,transform 1.1s cubic-bezier(.16,1.08,.38,.98)}
+.member[data-reveal].is-in,.sCard[data-reveal].is-in{opacity:1;transform:none}
+
+/* --- team member card --- */
+.member{display:block}
+.portrait{position:relative;aspect-ratio:3/4;overflow:hidden;background:#92bda5}
+.portrait:after{content:"";position:absolute;inset:0;background:url("../images/portrait.svg") center bottom/92% no-repeat;transition:transform 1.2s cubic-bezier(.16,1.08,.38,.98)}
+.portrait img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover}
+.member:nth-child(6n+1) .portrait{background:#a8d5ba}
+.member:nth-child(6n+2) .portrait{background:#92bda5}
+.member:nth-child(6n+3) .portrait{background:#7ba58f}
+.member:nth-child(6n+4) .portrait{background:#cfe6d6}
+.member:nth-child(6n+5) .portrait{background:#658d79}
+.member:nth-child(6n) .portrait{background:#b9dcc6}
+@media (hover:hover){.member:hover .portrait:after{transform:scale(1.05)}.member:hover .member_name{text-decoration-color:currentColor}}
+.member_name{display:inline-block;margin-top:1.8rem;font-size:max(1.8rem,13px);font-weight:700;letter-spacing:-.02em;line-height:1.1;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:.2em;transition:text-decoration-color .4s}
+.member_role{display:block;margin-top:.8rem;font-size:max(1.2rem,10px);line-height:1.35;opacity:.6;max-width:24rem}
+
+/* --- strategy card --- */
+.sCard{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;min-height:48rem;padding:3rem;background:var(--c);color:var(--t)}
+.sCard:before{content:"";position:absolute;top:0;right:0;width:60%;height:60%;background:url("../images/line-white.svg") 0 0/3rem 3rem;opacity:.28;pointer-events:none}
+.sCard.is-light:before{filter:invert(1)}
+.sCard_top{position:relative;display:flex;justify-content:space-between;align-items:center;font-size:max(1.4rem,11px);font-weight:700;letter-spacing:-.02em}
+.sCard_tag{padding:.6rem 1.4rem;border:1px solid currentColor;border-radius:2.5em;font-size:max(1.2rem,10px)}
+.sCard_name{position:relative;font-size:6.5rem;font-weight:600;line-height:.92;letter-spacing:-.04em;margin:6rem 0 3rem}
+.sCard_desc{position:relative;max-width:34rem}
+@media (hover:hover){.sCard.is-in{transition:transform .8s cubic-bezier(.16,1.08,.38,.98)}.sCard.is-in:hover{transform:translateY(-1rem)}}
+@media (max-width:811px){.directory_grid--cards{grid-template-columns:1fr}.sCard{min-height:40rem}.sCard_name{font-size:5.4rem}}
+
+/* --- team member detail --- */
+.person{display:flex;flex-direction:column;background:#f1f8f3;color:#0b2e22}
+.person_photo{order:-1;position:relative;height:60vh;background:#a8d5ba}
+.person_photo .portrait{position:absolute;inset:0;aspect-ratio:auto}
+.person_text{padding:4rem 3.125rem 8rem}
+.person_back{display:inline-block;margin-bottom:4rem;font-weight:700;font-size:max(1.4rem,11px)}
+.person_name,.person_role{margin-bottom:4rem}
+.person_bio p{margin-bottom:2rem;break-inside:avoid}
+.person_block{position:relative;margin-top:5rem;padding-top:3rem}
+.person_block:before{content:"";position:absolute;top:0;left:0;width:100%;height:1px;background:#0b2e22}
+.person_label{display:block;margin-bottom:2rem;font-size:max(1.4rem,11px)}
+.person_list li{margin-bottom:.4rem;white-space:nowrap}
+@media (max-width:811px){.person_list{font-size:2.5rem}}
+@media (min-width:812px){
+  .person{flex-direction:row;min-height:100vh}
+  .person_text{flex:0 0 50%;padding:20rem 6rem 14rem}
+  .person_text>*{max-width:52rem}
+  .person_photo{order:0;flex:1;height:100vh;position:sticky;top:0}
+  .person_bio{column-count:2;column-gap:3rem}
+}
+
+/* --- profile page typography (matches reference: Manrope headings, Inter body) --- */
+.person{font-family:Inter,"Helvetica Neue",helvetica,arial,sans-serif}
+.person .hm-3,.person .hm-4,.person .hm-5,.person .person_label,.person .person_back{font-family:Manrope,Inter,"Helvetica Neue",helvetica,arial,sans-serif;font-weight:700;letter-spacing:-.02em;word-spacing:0}
+.person .person_bio{font-weight:400;letter-spacing:0}
+@media (min-width:812px){
+  .person_text{padding-left:6.8rem}
+  .person_text>*{max-width:61rem}
+  .person .person_name{font-size:6.8rem;line-height:1.1;margin-bottom:5rem}
+  .person .person_role{font-size:3.6rem;line-height:1.1;margin-bottom:5rem}
+  .person .person_bio{font-size:1.7rem;line-height:1.75;column-count:2;column-gap:3.8rem}
+  .person .person_bio p{margin-bottom:2.6rem}
+  .person .person_label{font-size:1.6rem;font-weight:400;font-family:Inter,"Helvetica Neue",helvetica,arial,sans-serif;letter-spacing:0}
+  .person .person_block .hm-4,.person .person_block .hm-5{font-size:3.6rem;line-height:1.1}
+  .person .person_block{margin-top:4.5rem;padding-top:3.5rem}
+}

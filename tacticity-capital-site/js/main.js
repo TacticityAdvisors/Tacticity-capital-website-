@@ -28,6 +28,7 @@
       header.classList.toggle('is-active', y < 50 || y < lastY);
     }
     lastY = y;
+    updatePanel();
     updateDark();
     updateMask();
   }
@@ -42,7 +43,7 @@
       var r = els[i].getBoundingClientRect();
       if (r.top <= hy && r.bottom >= hy) { on = true; break; }
     }
-    header.classList.toggle('on-dark', on);
+    header.classList.toggle('on-dark', on || maskDark);
   }
 
   /* ---- "Our Funds" circular mask driven by scroll ---- */
@@ -94,28 +95,72 @@
     onScroll();
   }
 
-  /* ---- hero title loop ---- */
+  /* ---- hero title loop (a single word just slides in and stays) ---- */
   function initTitleLoop() {
     clearInterval(titleTimer);
-    var loop = page.querySelector('.titleLoop');
-    if (!loop) return;
-    var words = loop.querySelectorAll('.titleLoop_word');
-    var i = 0;
-    setTimeout(function () {
-      loop.classList.add('is-ready');
-      words[0].classList.add('is-current');
-    }, 200);
-    titleTimer = setInterval(function () {
-      var prev = words[i];
-      i = (i + 1) % words.length;
-      prev.classList.remove('is-current'); prev.classList.add('is-past');
-      words[i].classList.remove('is-past'); words[i].style.transition = 'none';
-      words[i].style.transform = 'translate3d(0,100%,0)';
-      void words[i].offsetWidth;
-      words[i].style.transition = ''; words[i].style.transform = '';
-      words[i].classList.add('is-current');
-    }, 2600);
+    page.querySelectorAll('.titleLoop').forEach(function (loop) {
+      var words = loop.querySelectorAll('.titleLoop_word');
+      var i = 0;
+      setTimeout(function () {
+        loop.classList.add('is-ready');
+        words[0].classList.add('is-current');
+      }, 200);
+      if (words.length < 2) return;
+      titleTimer = setInterval(function () {
+        var prev = words[i];
+        i = (i + 1) % words.length;
+        prev.classList.remove('is-current'); prev.classList.add('is-past');
+        words[i].classList.remove('is-past'); words[i].style.transition = 'none';
+        words[i].style.transform = 'translate3d(0,100%,0)';
+        void words[i].offsetWidth;
+        words[i].style.transition = ''; words[i].style.transform = '';
+        words[i].classList.add('is-current');
+      }, 2600);
+    });
   }
+
+  /* ---- strategy / team: dark circle follows the cursor, then swallows the hero on scroll ---- */
+  var mx = null, my = null, maskDark = false, mRaf = 0;
+  window.addEventListener('mousemove', function (e) {
+    mx = e.clientX; my = e.clientY;
+    if (!mRaf) mRaf = requestAnimationFrame(function () { mRaf = 0; updatePanel(); });
+  }, { passive: true });
+
+  function updatePanel() {
+    var sec = page.querySelector('.maskp');
+    maskDark = false;
+    if (!sec || window.innerWidth < 812) return;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var r = sec.getBoundingClientRect();
+    var p = Math.min(1, Math.max(0, -r.top / (r.height - vh)));
+    var s = sec.querySelector('.maskp_sticky').getBoundingClientRect();
+    var dark = sec.querySelector('.maskp_dark');
+    var ease = function (t) { return 1 - Math.pow(1 - t, 3); };
+    var k = ease(Math.min(1, p / .3));
+    var x0 = mx == null ? vw / 2 : mx, y0 = my == null ? vh / 2 : my;
+    var cx = x0 + (vw / 2 - x0) * k - s.left;
+    var cy = y0 + (vh / 2 - y0) * k - s.top;
+    var rad = ease(Math.min(1, p / .8)) * Math.hypot(vw, vh) * .55;   // no circle until you scroll
+    dark.style.clipPath = 'circle(' + rad.toFixed(1) + 'px at ' + cx.toFixed(1) + 'px ' + cy.toFixed(1) + 'px)';
+    sec.classList.toggle('is-open', p > .6);
+    sec.classList.toggle('is-scrolled', p > .02);
+    maskDark = p > .6 && r.bottom > 60;
+  }
+
+  /* ---- filters (team + strategies) ---- */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-filter]');
+    if (!b) return;
+    var wrap = b.closest('.directory');
+    wrap.querySelectorAll('[data-filter]').forEach(function (x) { x.classList.toggle('is-active', x === b); });
+    var f = b.dataset.filter;
+    wrap.querySelectorAll('[data-cat]').forEach(function (it) {
+      var show = f === 'all' || (' ' + it.dataset.cat + ' ').indexOf(' ' + f + ' ') > -1;
+      it.hidden = !show;
+      it.classList.remove('is-shown');
+      if (show) { void it.offsetWidth; it.classList.add('is-shown'); }
+    });
+  });
 
   /* ---- page transition ----
      Mirrors the original (react-spring useTransition, exitBeforeEnter):
